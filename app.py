@@ -22,6 +22,9 @@ def get_sunrise(lat, lng, tz="America/Lima"):
 def get_current_value(sunrise_time, tz="America/Lima"):
     now = datetime.now(pytz.timezone(tz))
     minutes_passed = int((now - sunrise_time).total_seconds() / 60)
+
+    if minutes_passed < 0:
+        return None  # aún no amanece
     
     # ciclo de 24 min y duración 2h (24*5)
     value = ((minutes_passed / 24) % 5)
@@ -33,39 +36,47 @@ LNG = -71.96746
 
 def get_sunrise_value():
     sunrise, sunset = get_sunrise(LAT, LNG)
-    value, now, minutes = get_current_value(sunrise)
     amanecer = sunrise.strftime("%H:%M")
     atardecer = sunset.strftime("%H:%M")
     now = datetime.now(pytz.timezone("America/Lima"))
     actual = now.strftime("%H:%M")
-    enTatwa = minutes % 24
-    restante = 24 - minutes % 24
-    valor = value
-    value_name = ""
+    if get_current_value(sunrise):
 
-    if int(value) == 1:
-             
-        value_name = "AKASHA"
+        value, now, minutes = get_current_value(sunrise)
+        enTatwa = minutes % 24
+        restante = 24 - minutes % 24
+        valor = value
+        value_name = ""
 
-    elif int(value) == 2:
-     
-        value_name = "VAYU"
 
-    elif int(value) == 3:
-   
-        value_name = "TEJAS"
+        if int(value) == 1:
+                
+            value_name = "AKASHA"
+
+        elif int(value) == 2:
+        
+            value_name = "VAYU"
+
+        elif int(value) == 3:
     
-    elif int(value) == 4:
-     
-        value_name = "PRITHIVI"
+            value_name = "TEJAS"
+        
+        elif int(value) == 4:
+        
+            value_name = "PRITHIVI"
 
-    elif int(value) == 5 or int(value) == 0:
-    
-        value_name = "APAS"
+        elif int(value) == 5 or int(value) == 0:
+        
+            value_name = "APAS"
+        
+        
 
 
 
-    return {"amanecer": amanecer, 'atardecer': atardecer, "actual": actual, 'now': now.date().isoformat(),  'minutos':minutes,"enTatwa": enTatwa, 'restante': restante, 'valor': valor, 'nombre_valor': value_name}
+        return {"amanecer": amanecer, 'atardecer': atardecer, "actual": actual, 'now': now.date().isoformat(),  'minutos':minutes,"enTatwa": enTatwa, 'restante': restante, 'valor': valor, 'nombre_valor': value_name}
+    else:
+        situacion='AUN NO AMANECE'
+        return {"amanecer": amanecer, 'atardecer': atardecer, "actual": actual, 'now': now.date().isoformat(),  'minutos':situacion, "enTatwa": situacion, 'restante': situacion, 'valor': situacion, 'nombre_valor': situacion}
 
 
 @app.get("/value")
