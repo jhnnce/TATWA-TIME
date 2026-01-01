@@ -7,9 +7,9 @@ from datetime import datetime
 app = FastAPI()
 
 
-def get_sunrise(lat, lng, tz="America/Lima"):
+def get_sunrise(lat, lng, dia='today', tz="America/Lima"):
     url = "https://api.sunrise-sunset.org/json"
-    params = {"lat": lat, "lng": lng, "date": "today", "formatted": 0, 'tzid': tz}
+    params = {"lat": lat, "lng": lng, "date": dia, "formatted": 0, 'tzid': tz}
     data = requests.get(url, params=params).json()["results"]
     
     sunrise_utc = datetime.fromisoformat(data["sunrise"])
@@ -17,7 +17,10 @@ def get_sunrise(lat, lng, tz="America/Lima"):
     local_tz = pytz.timezone(tz)
     sunrise_local = sunrise_utc.astimezone(local_tz)
     sunset_local = sunset_utc.astimezone(local_tz)
+    print(sunrise_local)
     return sunrise_local, sunset_local
+
+
 
 def get_current_value(sunrise_time, tz="America/Lima"):
     now = datetime.now(pytz.timezone(tz))
@@ -27,7 +30,7 @@ def get_current_value(sunrise_time, tz="America/Lima"):
         return None  # aún no amanece
     
     # ciclo de 24 min y duración 2h (24*5)
-    value = ((minutes_passed / 24) % 5)
+    value = ((minutes_passed / 24) % 5) + 1
     return value, now, minutes_passed
 
 LAT = -13.53195
@@ -35,9 +38,17 @@ LNG = -71.96746
 
 
 def get_sunrise_value():
+
     sunrise, sunset = get_sunrise(LAT, LNG)
-    amanecer = sunrise.strftime("%H:%M")
-    atardecer = sunset.strftime("%H:%M")
+    now = datetime.now(pytz.timezone("America/Lima"))
+    if now < sunrise:
+        dia='yesterday'
+    else:
+        dia='today'
+    sunrise, sunset = get_sunrise(LAT, LNG, dia)
+    amanecer = sunrise.strftime("%H:%M (%Y-%m-%d)")
+    atardecer = sunset.strftime("%H:%M (%Y-%m-%d)")
+    print(sunrise, sunset)
     now = datetime.now(pytz.timezone("America/Lima"))
     actual = now.strftime("%H:%M")
     if get_current_value(sunrise):
@@ -65,7 +76,7 @@ def get_sunrise_value():
         
             value_name = "PRITHIVI"
 
-        elif int(value) == 5 or int(value) == 0:
+        elif int(value) == 5:
         
             value_name = "APAS"
         
@@ -95,16 +106,17 @@ def home():
                     let r = await fetch('/value');
                     let data = await r.json();
                     document.getElementById("val").innerHTML = 'Fecha Actual: ' + data.now + '<br>' +
+                        'Hora Actual: ' + data.actual + '<br>' +
                         'Salida de Sol: ' + data.amanecer + '<br>' +
                         'Puesta de Sol: ' + data.atardecer + '<br>' +
-                        'Hora Actual: ' + data.actual + '<br>' +
-                        'Minutos desde el Amanecer: ' + data.minutos + '<br>' +
-                        'Minutos pasados: ' + data.enTatwa + '<br>' +
-                        'Minutos restantes: ' + data.restante + '<br>' +
-                        'Valor: ' + data.valor + '<br>' +
-                        'Tatwa: ' + data.nombre_valor;
+                        'Minutos desde el Amanecer: ' + data.minutos + '<br>' + '<br>' +
+                        'TATWA: ' + data.nombre_valor + '<br>' +
+                        'Minutos pasados en el Tatwa: ' + data.enTatwa + '<br>' +
+                        'Minutos restantes en el Tatwa: ' + data.restante + '<br>' +
+                        'Valor: ' + data.valor + '<br>';
+                        
                 }
-                setInterval(load, 2000);
+                setInterval(load, 20000);
                 load();
             </script>
         </head>
