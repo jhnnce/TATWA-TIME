@@ -16,7 +16,7 @@ def get_sunrise(lat, lng, dia='today', timezone="America/Lima"):
     sunset_utc = data["sunset"]
     date = data["date"]
 
-    
+    #print(date, sunrise_utc, sunset_utc)
     return date, sunrise_utc, sunset_utc
 
 
@@ -99,14 +99,22 @@ def get_sunrise_value():
     date, sunrise, sunset = get_sunrise(LAT, LNG)
     sunrise = datetime.strptime(sunrise, "%I:%M:%S %p")
     sunset = datetime.strptime(sunset, "%I:%M:%S %p")
-    date = datetime.strptime(date, "%Y-%m-%d")
+    date = datetime.strptime(date+' '+sunrise.strftime("%I:%M:%S %p"), "%Y-%m-%d %I:%M:%S %p")
  
 
     now = datetime.now(pytz.timezone("America/Lima"))
-    if now.date() < date.date():
+    
+    minutos = now.time().strftime("%H:%M:%S").split(":")
+    tz = pytz.timezone("America/Lima")
+
+    combined = datetime.combine(datetime.now(tz).date(), time(int(minutos[0]), int(minutos[1]), int(minutos[2])))
+
+    if combined < date:
+       
         dia='yesterday'
     else:
         dia='today'
+
     
 
     date, sunrise, sunset = get_sunrise(LAT, LNG, dia)
