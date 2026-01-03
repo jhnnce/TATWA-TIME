@@ -82,6 +82,7 @@ def next_tatwa_time(hora_inicial: str, repeticiones: int = 60) -> None:
             now = datetime.now(pytz.timezone("America/Lima"))
             minutos = now.time().strftime("%H:%M:%S").split(":")
             combined = datetime.combine(date.today(), time(int(minutos[0]), int(minutos[1]), int(minutos[2])))
+            print(f"Comparando: {t} con {combined}")
             if t > combined:
                 if value_name== "APAS":
                     valor += f'{t.time().strftime("%I:%M:%S %p")} | {value_name}<br><br>'
