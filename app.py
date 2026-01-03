@@ -25,7 +25,8 @@ def get_current_value(date, sunrise_time, tz="America/Lima"):
     sunrise_time = datetime.strptime(date + " " + sunrise_time, "%Y-%m-%d %I:%M:%S %p")
 
     minutos = now.time().strftime("%H:%M:%S").split(":")
-    combined = datetime.combine(datetime.today(), datetime.strptime(f"{minutos[0]}:{minutos[1]}:{minutos[2]}", "%H:%M:%S").time())
+    tz = pytz.timezone("America/Lima")
+    combined = datetime.combine(datetime.now(tz).date(), datetime.strptime(f"{minutos[0]}:{minutos[1]}:{minutos[2]}", "%H:%M:%S").time())
     minutes_passed = int((combined - sunrise_time).total_seconds() / 60)
 
     if minutes_passed < 0:
@@ -81,8 +82,10 @@ def next_tatwa_time(hora_inicial: str, repeticiones: int = 60) -> None:
 
             now = datetime.now(pytz.timezone("America/Lima"))
             minutos = now.time().strftime("%H:%M:%S").split(":")
-            combined = datetime.combine(date.today(), time(int(minutos[0]), int(minutos[1]), int(minutos[2])))
-            print(f"Comparando: {t} con {combined}")
+            tz = pytz.timezone("America/Lima")
+
+            combined = datetime.combine(datetime.now(tz).date(), time(int(minutos[0]), int(minutos[1]), int(minutos[2])))
+            
             if t > combined:
                 if value_name== "APAS":
                     valor += f'{t.time().strftime("%I:%M:%S %p")} | {value_name}<br><br>'
