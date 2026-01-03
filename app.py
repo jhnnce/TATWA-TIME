@@ -162,32 +162,44 @@ def get_value():
 def home():
     return HTMLResponse("""
         <html>
-        <head>
-            <title>Sun Value</title>
-            <script>
-                async function load() {
-                    let r = await fetch('/value');
-                    let data = await r.json();
-                    document.getElementById("val").innerHTML = 'Fecha Actual: ' + data.now + '<br>' +
-                        'Hora Actual: ' + data.actual + '<br>' +
-                        'Salida de Sol: ' + data.amanecer + ' (' + data.date_sun + ')' + '<br>' +
-                        'Puesta de Sol: ' + data.atardecer + ' (' + data.date_sun + ')' + '<br>' +
-                        'Minutos desde el Amanecer: ' + data.minutos + '<br>' + '<br>' +
-                        'TATWA: ' + data.nombre_valor + '<br>' +
-                        'Minutos pasados en el Tatwa: ' + data.enTatwa + '<br>' +
-                        'Minutos restantes en el Tatwa: ' + data.restante + '<br>' +
-                        'Valor: ' + data.valor + '<br>' + '<br>' +
-                        'Próximos Tatwas:<br>'+'<br>' + data.proximos + '<br>';
-                        
-                }
-                setInterval(load, 20000);
-                load();
-            </script>
-        </head>
-        <body style="font-family:Arial;text-align:center;padding-top:30px;">
-            <h1 style="font-size:40px;" id="val"></h1>
-        </body>
-        </html>
+<head>
+    <title>Sun Value</title>
+
+    <style>
+        body {
+            background-color: #1D4796;
+            color: #fff;
+            font-family: Arial;
+        }
+    </style>
+
+    <script>
+        async function load() {
+            let r = await fetch('/value');
+            let data = await r.json();
+            document.getElementById("val").innerHTML =
+                'Fecha Actual: ' + data.now + '<br>' +
+                'Hora Actual: ' + data.actual + '<br>' +
+                'Salida de Sol: ' + data.amanecer + ' (' + data.date_sun + ')' + '<br>' +
+                'Puesta de Sol: ' + data.atardecer + ' (' + data.date_sun + ')' + '<br>' +
+                'Minutos desde el Amanecer: ' + data.minutos + '<br><br>' +
+                'TATWA: ' + data.nombre_valor + '<br>' +
+                'Minutos pasados en el Tatwa: ' + data.enTatwa + '<br>' +
+                'Minutos restantes en el Tatwa: ' + data.restante + '<br>' +
+                'Valor: ' + data.valor + '<br><br>' +
+                'Próximos Tatwas:<br><br>' +
+                data.proximos;
+        }
+        setInterval(load, 20000);
+        load();
+    </script>
+</head>
+
+<body style="text-align:center;padding-top:30px;">
+    <h1 style="font-size:40px;" id="val"></h1>
+</body>
+</html>
+
     """)
 
 
