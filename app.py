@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, HTMLResponse
 import requests
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 
 app = FastAPI()
 
@@ -24,7 +24,6 @@ def get_current_value(date, sunrise_time, tz="America/Lima"):
     now = datetime.now(pytz.timezone(tz))
     sunrise_time = datetime.strptime(date + " " + sunrise_time, "%Y-%m-%d %I:%M:%S %p")
 
-    now = datetime.now(pytz.timezone("America/Lima"))
     minutos = now.time().strftime("%H:%M:%S").split(":")
     combined = datetime.combine(datetime.today(), datetime.strptime(f"{minutos[0]}:{minutos[1]}:{minutos[2]}", "%H:%M:%S").time())
     minutes_passed = int((combined - sunrise_time).total_seconds() / 60)
@@ -80,8 +79,10 @@ def next_tatwa_time(hora_inicial: str, repeticiones: int = 60) -> None:
             
                 value_name = "APAS"
 
-            
-            if t > datetime.now():
+            now = datetime.now(pytz.timezone("America/Lima"))
+            minutos = now.time().strftime("%H:%M:%S").split(":")
+            combined = datetime.combine(date.today(), time(int(minutos[0]), int(minutos[1]), int(minutos[2])))
+            if t > combined:
                 if value_name== "APAS":
                     valor += f'{t.time().strftime("%I:%M:%S %p")} | {value_name}<br><br>'
                 else:
